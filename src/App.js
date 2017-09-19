@@ -7,25 +7,6 @@ const PATH_BASE = 'https://hn.algolia.com/api/v1';
 const PATH_SEARCH = '/search';
 const PARAM_SEARCH = 'query=';
 
-const list = [
-  {
-    title: 'React',
-    url: 'https://facebook.github.io/react/',
-    author: 'Jordan Walke',
-    num_comments: 3,
-    points: 4,
-    objectID: 0,
-  },
-  {
-    title: 'Redux',
-    url: 'https://github.com/reactjs/redux',
-    author: 'Dan Abramov, Andrew Clark',
-    num_comments: 2,
-    points: 5,
-    objectID: 1,
-  },
-];
-
 const isSearched = (searchTerm) => (item) => 
   !searchTerm || item.title.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -45,7 +26,7 @@ class App extends Component {
     this.onSearchChange = this.onSearchChange.bind(this);
   }
 
-  searchTopStoreis(result) {
+  setSearchTopstories(result) {
     this.setState({ result });
   }
 
@@ -74,8 +55,13 @@ class App extends Component {
   render() {  
     const {
       searchTerm,
-      list
+      result
     } = this.state;
+
+    if(!result) { return null; }
+
+    console.log(this.state)
+
     return(
       <div className="page">
         <div className="interactions">
@@ -87,7 +73,7 @@ class App extends Component {
           </Search>
         </div> 
         <Table 
-          list={list}
+          list={result.hits}
           pattern={searchTerm}
           onDismiss={this.onDismiss}
         />
