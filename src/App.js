@@ -60,10 +60,6 @@ class App extends Component {
       result
     } = this.state;
 
-    if(!result) { return null; }
-
-    console.log(this.state)
-
     return(
       <div className="page">
         <div className="interactions">
@@ -73,12 +69,15 @@ class App extends Component {
           >
             Search
           </Search>
-        </div> 
-        <Table 
-          list={result.hits}
-          pattern={searchTerm}
-          onDismiss={this.onDismiss}
-        />
+        </div>
+        { result ?
+          <Table 
+            list={result.hits}
+            pattern={searchTerm}
+            onDismiss={this.onDismiss}
+          />
+          : null
+        } 
       </div>
     );
   }
