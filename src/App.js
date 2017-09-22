@@ -253,3 +253,9 @@ Button.PropTypes = {
 };
 
 export default App;
+
+export {
+  Button,
+  Search,
+  Table,
+};
