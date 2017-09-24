@@ -83,7 +83,7 @@ describe('Table', () => {
       <Table { ...props } />
     );
 
-    expect(elemnt.find('.table-row').length).toBe(2);
+    expect(element.find('.table-row').length).toBe(2);
   });
 
 });
