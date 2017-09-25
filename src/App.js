@@ -23,6 +23,57 @@ const SORTS = {
   AUTHOR: list => sortBy(list, 'author'),
   COMMENTS: list => sortBy(list, 'num_comments').reverse(),
   POINTS: list => sortBy(list, 'points').reverse(),
+};
+
+const updateSearchTopstoreisState = (hits, page) => (prevState) => {
+  const {
+    searchKey,
+    results
+  } = prevState;
+
+  const oldHits = results && results[searchKey]
+    ? results[searchKey].hits
+    : []
+
+  const updatedHits = [
+    ...oldHits,
+    ...hits
+  ];
+
+  return {
+    results: {
+      ...results,
+      [searchKey]: { hits: updatedHits, page }
+    },
+    isLoading: false
+  };
+};
+
+const dismissStory = (id) => (prevState) => {
+  const {
+    searchKey,
+    results
+  } = prevState;
+
+  const {
+    hits,
+    page
+  } = results[searchKey];
+
+  const isNotId = item => item.objectID !== id;
+  const updatedHits = hits.filter(isNotId);
+
+  return {
+    results: {
+      ...results, 
+      [searchKey] : {hits: updatedHits, page }  
+    }
+  };
+};
+
+const updateSearchTerm = () => (prevState) => {
+  const { searchTerm } = prevState;
+  return { searchKey: searchTerm };
 }
 
 class App extends Component {
@@ -55,27 +106,7 @@ class App extends Component {
       page
     } = result;
 
-    const {
-      searchKey,
-      results
-    } = this.state;
-
-    const oldHits = results && results[searchKey]
-      ? results[searchKey].hits
-      : [];
-
-    const updatedHits = [
-      ...oldHits,
-      ...hits
-    ];
-
-    this.setState({
-      results: { 
-        ...results,
-        [searchKey]: { hits: updatedHits, page }
-      },
-      isLoading: false
-    })
+    this.setState(updateSearchTopstoreisState(hits,page));
   }
 
   fetchSearchTopstories(searchTerm, page) {
@@ -88,42 +119,28 @@ class App extends Component {
   }
 
   onSearchSubmit(event) {
+    this.setState(updateSearchTerm());
     const { searchTerm } = this.state;
-    this.setState({ searchKey: searchTerm });
-
     if(this.needsToSearchTopstories(searchTerm)) {
       this.fetchSearchTopstories(searchTerm, DEFAULT_PAGE);      
     }
-
     event.preventDefault();
   }
 
   componentDidMount() {
+    this.setState(updateSearchTerm());
     const { searchTerm } = this.state;
-    this.setState({ searchKey: searchTerm });
     this.fetchSearchTopstories(searchTerm, DEFAULT_PAGE);
   }
 
+  /*componentDidMount() {
+    const { searchTerm } = this.state;
+    this.setState({ searchKey: searchTerm });
+    this.fetchSearchTopstories(searchTerm, DEFAULT_PAGE);
+  }*/
+
   onDismiss(id) {
-    const {
-      searchKey,
-      results
-    } = this.state;
-
-    const {
-      hits,
-      page
-    } = results[searchKey];
-
-    const isNotId = item => item.objectID !== id;
-    const updatedHits = hits.filter(isNotId);
-
-    this.setState({
-      results: {
-        ...results, 
-        [searchKey] : {hits: updatedHits, page }  
-      }
-    });
+    this.setState(dismissStory(id));
   }
 
   onSearchChange(event) {
